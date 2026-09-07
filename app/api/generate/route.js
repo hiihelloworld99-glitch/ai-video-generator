@@ -17,7 +17,7 @@ export async function POST(request) {
     }
 
     const output = await replicate.run(
-      "bytedance/sora-like-model:example", // Example model placeholder
+      "minimax/video-01",
       {
         input: {
           prompt: prompt,
@@ -25,7 +25,7 @@ export async function POST(request) {
       }
     );
 
-    return NextResponse.json({ output });
+    return NextResponse.json({ videoUrl: output });
   } catch (error) {
     return NextResponse.json(
       { error: error.message || 'Something went wrong' },
