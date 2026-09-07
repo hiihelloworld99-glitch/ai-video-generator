@@ -22,7 +22,6 @@ export default function TextToVideoPage() {
     setStatusMessage('Initiating video generation...');
 
     try {
-      // Send generation request to Next.js API route
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
@@ -43,8 +42,10 @@ export default function TextToVideoPage() {
         );
       }
 
-      if (data.videoUrl) {
-        setVideoUrl(data.videoUrl);
+      // यह सुनिश्चित करेगा कि वीडियो का सही लिंक यूज़र को मिले
+      const finalUrl = data.videoUrl || data.output;
+      if (finalUrl) {
+        setVideoUrl(typeof finalUrl === 'string' ? finalUrl : finalUrl.url);
         setStatusMessage('Video generation completed!');
       } else {
         throw new Error('No video output received from model.');
@@ -61,54 +62,41 @@ export default function TextToVideoPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-4 sm:p-8 selection:bg-indigo-500 selection:text-white">
-      {/* Background ambient glows */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-indigo-600/20 rounded-full blur-[128px]" />
-
         <div className="absolute bottom-1/4 left-1/3 w-[450px] h-[450px] bg-cyan-500/15 rounded-full blur-[128px]" />
       </div>
 
       <div className="w-full max-w-3xl mx-auto space-y-6">
-        {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-200 bg-clip-text text-transparent">
             AI Text-to-Video Generator
           </h1>
-
           <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto">
             Transform descriptive prompts into cinematic high-definition video clips.
           </p>
         </div>
 
-        {/* Glassmorphic Card */}
         <div className="backdrop-blur-xl bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/50 space-y-6">
-          {/* Prompt Textarea */}
           <div className="space-y-2">
-            <label
-              htmlFor="prompt-input"
-              className="block text-sm font-medium text-slate-300"
-            >
+            <label htmlFor="prompt-input" className="block text-sm font-medium text-slate-300">
               Video Description Prompt
             </label>
-
             <textarea
               id="prompt-input"
               rows={4}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="e.g. A neon-lit futuristic drone cruising smoothly above a cybernetic city at dusk, rain reflections on glass, cinematic lighting..."
+              placeholder="e.g. A greedy Indian milkman secretly pouring water into milk cans..."
               className="w-full rounded-xl bg-slate-950/70 border border-slate-800 px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all resize-none text-sm sm:text-base"
             />
           </div>
 
-          {/* Settings Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Aspect Ratio */}
             <div className="space-y-2">
               <span className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Aspect Ratio
               </span>
-
               <div className="flex gap-2">
                 {[
                   { id: '16:9', label: '16:9 Landscape' },
@@ -131,12 +119,10 @@ export default function TextToVideoPage() {
               </div>
             </div>
 
-            {/* Duration */}
             <div className="space-y-2">
               <span className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Duration
               </span>
-
               <div className="flex gap-2">
                 {[
                   { id: '4s', label: '4 Seconds (Fast)' },
@@ -159,7 +145,6 @@ export default function TextToVideoPage() {
             </div>
           </div>
 
-          {/* Action Button */}
           <button
             id="generate-video-btn"
             type="button"
@@ -169,28 +154,10 @@ export default function TextToVideoPage() {
           >
             {isLoading ? (
               <span className="flex items-center gap-3">
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8H4z"
-                  />
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                 </svg>
-
                 <span>Synthesizing Video...</span>
               </span>
             ) : (
@@ -198,21 +165,17 @@ export default function TextToVideoPage() {
             )}
           </button>
 
-          {/* Status / Loading Progress */}
           {isLoading && (
             <div className="p-4 rounded-xl bg-indigo-950/40 border border-indigo-800/40 text-center space-y-1.5 animate-pulse">
               <p className="text-sm font-medium text-indigo-300">
                 {statusMessage || 'Processing video generation on GPU...'}
               </p>
-
               <p className="text-xs text-slate-400">
-                High-definition neural rendering usually takes 30–90 seconds.
-                Please hold on!
+                High-definition neural rendering usually takes 30–90 seconds. Please hold on!
               </p>
             </div>
           )}
 
-          {/* Error Message */}
           {error && (
             <div className="p-4 rounded-xl bg-rose-950/50 border border-rose-800/60 text-rose-300 text-sm">
               {error}
@@ -220,14 +183,10 @@ export default function TextToVideoPage() {
           )}
         </div>
 
-        {/* Video Player Output Section */}
         {videoUrl && (
           <div className="backdrop-blur-xl bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/50 space-y-4 animate-fade-in">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-200">
-                Generated Video
-              </h2>
-
+              <h2 className="text-lg font-semibold text-slate-200">Generated Video</h2>
               <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-950/60 text-emerald-400 border border-emerald-800/50">
                 Ready for Download
               </span>
@@ -248,7 +207,6 @@ export default function TextToVideoPage() {
               <p className="text-xs text-slate-400 line-clamp-1 italic">
                 "{prompt}"
               </p>
-
               <a
                 id="download-mp4-btn"
                 href={videoUrl}
@@ -257,20 +215,9 @@ export default function TextToVideoPage() {
                 rel="noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 transition-colors shadow-md"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                  />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-
                 Download MP4
               </a>
             </div>
