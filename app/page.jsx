@@ -1,5 +1,4 @@
-‎// app/page.jsx
-‎'use client';
+'use client';
 ‎
 ‎import { useState } from 'react';
 ‎
