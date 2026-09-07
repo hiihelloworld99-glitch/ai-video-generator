@@ -1,8 +1,8 @@
 'use client';
 ‎
-‎import { useState } from 'react';
+import { useState } from 'react';
 ‎
-‎export default function TextToVideoPage() {
+export default function TextToVideoPage() {
 ‎  const [prompt, setPrompt] = useState('');
 ‎  const [aspectRatio, setAspectRatio] = useState('16:9');
 ‎  const [duration, setDuration] = useState('4s');
