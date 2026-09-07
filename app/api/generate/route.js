@@ -25,7 +25,9 @@ export async function POST(request) {
       }
     );
 
-    return NextResponse.json({ videoUrl: output });
+    const videoUrl = typeof output === 'string' ? output : (output?.url || String(output));
+
+    return NextResponse.json({ videoUrl: videoUrl });
   } catch (error) {
     return NextResponse.json(
       { error: error.message || 'Something went wrong' },
